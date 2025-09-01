@@ -4,6 +4,7 @@ python ./src/classifiers.py
 
 import numpy as np
 from utils.file_io import load_jsonl
+from tqdm import tqdm
 
 class LogisticClassifier:
     def __init__(
@@ -24,8 +25,8 @@ class LogisticClassifier:
         mus = np.mean(feature_array, axis=0)
         stds = np.std(feature_array, axis=0)
         normalized_feature_array = (feature_array - mus) / stds
-        biases = np.ones(feature_array.shape[0], 1)
-        normalized_feature_array = np.column_stack(normalized_feature_array, biases)
+        biases = np.ones((feature_array.shape[0], 1))
+        normalized_feature_array = np.column_stack((normalized_feature_array, biases))
         return normalized_feature_array
 
     def sigmoid(self, z:float) -> float:
@@ -51,9 +52,8 @@ class LogisticClassifier:
 
 
     def train(self):
-        for x, y in zip(self.feature_array, self.ground_truths):
-            self.update(x, y)
-                
+        for (x, y) in tqdm(zip(self.feature_array, self.ground_truths), total=len(self.feature_array)):
+            self.update(x, y)            
                 
 def main():
     train = load_jsonl("./data/polarity2/train.jsonl")
@@ -62,17 +62,12 @@ def main():
 
     ground_truths = np.array([row["sentiment"] == "pos" for row in train])
     feature_array = np.array([
-        np.array([row["n_capitals"] for row in train]),
-        np.array([row["n_exclamations"] for row in train]),
-        np.array([row["n_pos_words"] for row in train]),
-        np.array([row["n_neg_words"] for row in train]),
-        ])
+        [row["n_capitals"], row["n_exclamations"], row["n_pos_words"], row["n_neg_words"]]
+        for row in train
+    ])
 
     lc = LogisticClassifier(feature_array, ground_truths)
-    print(lc.feature_array)
-    # sigz = lc.sigmoid(lc.z)
-    # print(sigz)
-    
+    lc.train()    
 
 if __name__ == '__main__':
     main()
