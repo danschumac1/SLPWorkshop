@@ -1,0 +1,10 @@
+# Ignore everything in data/
+data/*
+
+# But keep these two files
+!data/readme.md
+!data/polarity2.md
+
+# Ignore Python cache
+__pycache__/
+*.pyc
