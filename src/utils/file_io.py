@@ -39,6 +39,7 @@ def collect_corpus(dir: str, pos_lex: List[str], neg_lex: List[str],
     sentiment = "pos" if Path(dir).name == "pos" else "neg"
     p = Path(dir)
 
+
     for i, entry in tqdm(enumerate(p.iterdir()), total=sum(1 for _ in p.iterdir())):
         if entry.is_file() and entry.suffix == ".txt":
             raw_txt = entry.read_text(encoding="utf-8", errors="ignore")
